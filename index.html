@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>テレビ・ラジオ・スポーツ常識テスト</title>
+<style>
+  :root{
+    --bg: #f3f1ec;
+    --card: #ffffff;
+    --ink: #1f2430;
+    --ink-soft: #5a6072;
+    --line: #e4e1d8;
+    --accent-tv: #2f6fed;
+    --accent-radio: #e0652f;
+    --accent-sports: #1f9d63;
+    --accent: #2f6fed;
+    --good: #1f9d63;
+    --bad: #d3493a;
+    --shadow: 0 1px 2px rgba(20,20,30,.04), 0 8px 24px rgba(20,20,30,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg: #15171c;
+      --card: #1e2128;
+      --ink: #e9ebf1;
+      --ink-soft: #9aa0b2;
+      --line: #2b2f3a;
+      --accent-tv: #6d9bff;
+      --accent-radio: #ff9d6e;
+      --accent-sports: #5fd49b;
+      --accent: #6d9bff;
+      --good: #5fd49b;
+      --bad: #ff8577;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Hiragino Sans","Yu Gothic",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:32px 16px 64px;
+  }
+  .wrap{width:100%;max-width:640px;}
+  header{text-align:center;margin-bottom:28px;}
+  header h1{
+    font-size:1.5rem;
+    margin:0 0 6px;
+    letter-spacing:.01em;
+  }
+  header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:.9rem;
+  }
+  .badges{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .badge{
+    font-size:.75rem;
+    padding:4px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+  }
+  .badge.tv{border-color:color-mix(in srgb, var(--accent-tv) 40%, var(--line));}
+  .badge.radio{border-color:color-mix(in srgb, var(--accent-radio) 40%, var(--line));}
+  .badge.sports{border-color:color-mix(in srgb, var(--accent-sports) 40%, var(--line));}
+
+  .progress-track{
+    height:6px;
+    background:var(--line);
+    border-radius:999px;
+    overflow:hidden;
+    margin-bottom:20px;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    background:var(--accent);
+    border-radius:999px;
+    transition:width .3s ease;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px 24px;
+    box-shadow:var(--shadow);
+  }
+  .meta-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .q-count{font-size:.8rem;color:var(--ink-soft);}
+  .cat-chip{
+    font-size:.72rem;
+    font-weight:600;
+    padding:3px 10px;
+    border-radius:999px;
+    color:#fff;
+  }
+  .cat-chip.tv{background:var(--accent-tv);}
+  .cat-chip.radio{background:var(--accent-radio);}
+  .cat-chip.sports{background:var(--accent-sports);}
+
+  .question{
+    font-size:1.08rem;
+    line-height:1.6;
+    margin:0 0 20px;
+    font-weight:600;
+  }
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    text-align:left;
+    padding:13px 16px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--ink);
+    font-size:.96rem;
+    cursor:pointer;
+    transition:background .15s ease, border-color .15s ease, transform .1s ease;
+    font-family:inherit;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt:active{transform:scale(.99);}
+  .opt.correct{
+    background:color-mix(in srgb, var(--good) 16%, transparent);
+    border-color:var(--good);
+    color:var(--good);
+    font-weight:700;
+  }
+  .opt.wrong{
+    background:color-mix(in srgb, var(--bad) 14%, transparent);
+    border-color:var(--bad);
+    color:var(--bad);
+    font-weight:700;
+  }
+  .opt[disabled]{cursor:default;}
+  .opt.dim{opacity:.5;}
+
+  .explain{
+    margin-top:16px;
+    font-size:.86rem;
+    line-height:1.6;
+    color:var(--ink-soft);
+    padding-top:14px;
+    border-top:1px dashed var(--line);
+    display:none;
+  }
+  .explain.show{display:block;}
+
+  .next-row{margin-top:20px;text-align:right;}
+  .btn{
+    appearance:none;
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    font-weight:700;
+    font-size:.92rem;
+    padding:11px 22px;
+    border-radius:999px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .btn:disabled{opacity:.35;cursor:default;}
+  .btn.ghost{
+    background:transparent;
+    color:var(--accent);
+    border:1px solid var(--accent);
+  }
+
+  .result{display:none;text-align:center;}
+  .result.show{display:block;}
+  .result .score{
+    font-size:3rem;
+    font-weight:800;
+    margin:8px 0 2px;
+  }
+  .result .score span{font-size:1.4rem;color:var(--ink-soft);font-weight:600;}
+  .result .rank{
+    font-size:1.1rem;
+    font-weight:700;
+    color:var(--accent);
+    margin-bottom:14px;
+  }
+  .result .comment{
+    color:var(--ink-soft);
+    font-size:.92rem;
+    line-height:1.7;
+    margin-bottom:22px;
+  }
+  .result .breakdown{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+  }
+  .result .bd-item{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 16px;
+    min-width:90px;
+  }
+  .result .bd-item .n{font-size:1.3rem;font-weight:800;}
+  .result .bd-item .l{font-size:.72rem;color:var(--ink-soft);margin-top:2px;}
+
+  .quiz-area{display:block;}
+  .quiz-area.hide{display:none;}
+
+  footer{
+    text-align:center;
+    margin-top:26px;
+    font-size:.75rem;
+    color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>テレビ・ラジオ・スポーツ常識テスト</h1>
+    <p>普段からテレビ・ラジオ・スポーツに触れていれば分かる全25問</p>
+    <div class="badges">
+      <span class="badge tv">📺 テレビ</span>
+      <span class="badge radio">📻 ラジオ</span>
+      <span class="badge sports">⚽ スポーツ</span>
+    </div>
+  </header>
+
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="card">
+    <div class="quiz-area" id="quizArea">
+      <div class="meta-row">
+        <span class="cat-chip" id="catChip"></span>
+        <span class="q-count" id="qCount"></span>
+      </div>
+      <p class="question" id="questionText"></p>
+      <div class="options" id="options"></div>
+      <div class="explain" id="explain"></div>
+      <div class="next-row">
+        <button class="btn" id="nextBtn" disabled>次へ</button>
+      </div>
+    </div>
+
+    <div class="result" id="result">
+      <div class="q-count">あなたのスコア</div>
+      <div class="score" id="scoreText">0<span>/25</span></div>
+      <div class="rank" id="rankText"></div>
+      <p class="comment" id="commentText"></p>
+      <div class="breakdown" id="breakdown"></div>
+      <button class="btn ghost" id="retryBtn">もう一度挑戦する</button>
+    </div>
+  </div>
+
+  <footer>© テレビ・ラジオ・スポーツ常識テスト</footer>
+</div>
+
+<script>
+const QUESTIONS = [
+  // --- TV ---
+  {cat:"tv", label:"テレビ", q:"国民的アニメ「サザエさん」を長年放送しているテレビ局は？", opts:["日本テレビ","TBS","フジテレビ","テレビ朝日"], a:2, ex:"1969年から半世紀以上、フジテレビ系列で日曜夕方に放送されている長寿アニメです。"},
+  {cat:"tv", label:"テレビ", q:"大晦日の夜にNHKが生放送する歌唱番組といえば？", opts:["ベストヒット歌謡祭","紅白歌合戦","日本レコード大賞","歌のゴールデンヒット"], a:1, ex:"NHK紅白歌合戦は1951年から続く大晦日恒例の音楽特番です。"},
+  {cat:"tv", label:"テレビ", q:"毎年夏に日本テレビ系列で放送される24時間チャリティー番組は？", opts:["24時間テレビ","愛は地球を救う祭","サマーチャリティー","24時間マラソン祭"], a:0, ex:"正式タイトルは「24時間テレビ 愛は地球を救う」です。"},
+  {cat:"tv", label:"テレビ", q:"長寿演芸番組「笑点」の大喜利でお馴染みの座布団のやり取りがある番組を放送している局は？", opts:["TBS","日本テレビ","テレビ東京","NHK"], a:0, ex:"「笑点」は1966年からTBS系列で放送されている演芸番組です。"},
+  {cat:"tv", label:"テレビ", q:"NHKの看板ニュース番組「ニュースウオッチ9」が放送される時間帯は？", opts:["朝7時台","正午","夜9時台","深夜0時台"], a:2, ex:"平日夜9時からの総合テレビのニュース番組です。"},
+  {cat:"tv", label:"テレビ", q:"受信料で運営されている放送局はどこ？", opts:["フジテレビ","NHK","日本テレビ","テレビ朝日"], a:1, ex:"NHK（日本放送協会）は視聴者からの受信料で運営される公共放送です。"},
+  {cat:"tv", label:"テレビ", q:"番組の視聴率を示す単位としてよく使われるのは？", opts:["パーセント","ポイント","スコア","レート"], a:0, ex:"世帯視聴率・個人視聴率ともに「%（パーセント）」で表されます。"},
+  {cat:"tv", label:"テレビ", q:"大河ドラマを制作・放送している局は？", opts:["NHK","TBS","テレビ東京","フジテレビ"], a:0, ex:"NHK大河ドラマは1963年から続く歴史・時代劇シリーズです。"},
+  {cat:"tv", label:"テレビ", q:"天気予報などを伝える気象の専門家を一般に何と呼ぶ？", opts:["気象予報士","天気博士","気象アナウンサー","予報記者"], a:0, ex:"国家資格である「気象予報士」がテレビの天気コーナーを担当することが多いです。"},
+
+  // --- Radio ---
+  {cat:"radio", label:"ラジオ", q:"スマートフォンやPCでラジオ番組を聴ける配信サービスの名称は？", opts:["radiko","ラジる","音声バンク","ラジオTV"], a:0, ex:"「radiko（ラジコ）」は民放ラジオとNHKラジオをネットで聴けるサービスです。"},
+  {cat:"radio", label:"ラジオ", q:"深夜のラジオ番組の代名詞ともいえる、ニッポン放送などで放送される長寿深夜番組シリーズは？", opts:["オールナイトニッポン","ミッドナイトトーク","真夜中ラジオ","深夜便ナイト"], a:0, ex:"「オールナイトニッポン」は1967年開始、ニッポン放送の深夜放送枠です。"},
+  {cat:"radio", label:"ラジオ", q:"ラジオの「AM」「FM」とは何の違いを表す？", opts:["放送時間の長さ","電波の変調方式","電波の送信局数","受信機の価格帯"], a:1, ex:"AMは振幅変調、FMは周波数変調という電波の変調方式の違いです。"},
+  {cat:"radio", label:"ラジオ", q:"NHKが運営するラジオチャンネルで、語学講座やニュースを中心に放送しているのは？", opts:["NHKラジオ第1","NHK-FM","ラジオ深夜便局","NHKトーク"], a:0, ex:"NHKラジオ第1はニュース・報道・教養系の番組が中心です。"},
+  {cat:"radio", label:"ラジオ", q:"音楽中心の番組が多く、クラシックやJ-POPの番組が充実しているNHKのラジオチャンネルは？", opts:["NHKラジオ第2","NHK-FM","AMトーク局","NHKミュージック"], a:1, ex:"NHK-FMは音楽番組やクラシック、ライブ中継などが充実しています。"},
+  {cat:"radio", label:"ラジオ", q:"ラジオでリスナーから送られてくる手紙やメールの投稿のことを俗に何と呼ぶ？", opts:["ハガキ職人の投稿","ネタ便り","お便り","リクエスト帳"], a:2, ex:"リスナーから番組に届くメッセージは一般に「お便り」と呼ばれます。"},
+  {cat:"radio", label:"ラジオ", q:"車の運転中によく聞かれる、道路の混雑状況を伝える情報は？", opts:["交通情報","渋滞速報","道路ニュース","ロードレポート"], a:0, ex:"ラジオでは定時に「交通情報」コーナーが設けられていることが多いです。"},
+  {cat:"radio", label:"ラジオ", q:"災害時に最新情報を得る手段として、停電時でも強いとされるのは？", opts:["スマホアプリ","ラジオ（電池式）","テレビ","インターネット回線"], a:1, ex:"電池や手回し充電式のラジオは停電時の情報収集手段として重視されています。"},
+  {cat:"radio", label:"ラジオ", q:"番組の最後に流れる、放送終了を知らせる挨拶を一般に何という？", opts:["エンディング","しめ","サイン","クロージング"], a:0, ex:"番組の締めくくり部分を一般的に「エンディング」と呼びます。"},
+
+  // --- Sports ---
+  {cat:"sports", label:"スポーツ", q:"サッカーの1チームがピッチに立つ人数（交代選手を除く）は？", opts:["9人","10人","11人","12人"], a:2, ex:"サッカーは1チーム11人（うちゴールキーパー1人）で試合を行います。"},
+  {cat:"sports", label:"スポーツ", q:"野球でバッターが同じ打席中に3回ストライクを取られるとどうなる？", opts:["フォアボール","三振","ファウル","タイム"], a:1, ex:"3ストライクで「三振」となりバッターアウトです。"},
+  {cat:"sports", label:"スポーツ", q:"夏季・冬季ともに開催されるオリンピックの開催周期は？", opts:["2年に一度","3年に一度","4年に一度","5年に一度"], a:2, ex:"夏季・冬季オリンピックはそれぞれ4年に一度開催されます（交互に2年おき）。"},
+  {cat:"sports", label:"スポーツ", q:"大相撲における力士の最高位は？", opts:["大関","関脇","横綱","小結"], a:2, ex:"番付の頂点は「横綱」で、一度昇進すると原則引退まで地位は変わりません。"},
+  {cat:"sports", label:"スポーツ", q:"テニスで得点が0点のことを何と呼ぶ？", opts:["ゼロ","ラブ","ニル","ナッシング"], a:1, ex:"テニスのスコアで0点は「ラブ（love）」と呼びます。"},
+  {cat:"sports", label:"スポーツ", q:"毎年1月2日・3日に行われる、関東の大学駅伝の名物大会は？", opts:["富士山駅伝","箱根駅伝","東京駅伝","大学対抗駅伝"], a:1, ex:"「箱根駅伝」は東京・読売新聞社主催で、毎年1月2〜3日に開催されます。"},
+  {cat:"sports", label:"スポーツ", q:"プロ野球で日本シリーズに出場する2つのリーグは、セ・リーグと何リーグ？", opts:["パ・リーグ","アメリカンリーグ","ナショナルリーグ","西リーグ"], a:0, ex:"日本プロ野球はセントラル・リーグとパシフィック・リーグの2リーグ制です。"},
+  {cat:"sports", label:"スポーツ", q:"バレーボールで1チームがコート上でプレーする人数は？", opts:["5人","6人","7人","9人"], a:1, ex:"6人制バレーボールが一般的な国際ルールです。"},
+  {cat:"sports", label:"スポーツ", q:"ゴルフで、規定打数（パー）より1打少なく終えることを何と呼ぶ？", opts:["イーグル","バーディー","ボギー","アルバトロス"], a:1, ex:"パーより1打少ないのが「バーディー」、2打少ないのが「イーグル」です。"}
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+let order = shuffle(QUESTIONS.map((_,i)=>i));
+let idx = 0;
+let score = 0;
+let locked = false;
+const catStats = {tv:{correct:0,total:0}, radio:{correct:0,total:0}, sports:{correct:0,total:0}};
+
+const quizArea = document.getElementById('quizArea');
+const resultEl = document.getElementById('result');
+const progressFill = document.getElementById('progressFill');
+const catChip = document.getElementById('catChip');
+const qCount = document.getElementById('qCount');
+const questionText = document.getElementById('questionText');
+const optionsEl = document.getElementById('options');
+const explainEl = document.getElementById('explain');
+const nextBtn = document.getElementById('nextBtn');
+const retryBtn = document.getElementById('retryBtn');
+
+function render(){
+  locked = false;
+  const qi = order[idx];
+  const q = QUESTIONS[qi];
+  catStats[q.cat].total++;
+
+  catChip.textContent = (q.cat==='tv'?'📺 ':q.cat==='radio'?'📻 ':'⚽ ') + q.label;
+  catChip.className = 'cat-chip ' + q.cat;
+  qCount.textContent = `第 ${idx+1} 問 / 全 ${order.length} 問`;
+  questionText.textContent = q.q;
+  explainEl.classList.remove('show');
+  explainEl.textContent = '';
+  nextBtn.disabled = true;
+  progressFill.style.width = `${(idx/order.length)*100}%`;
+
+  optionsEl.innerHTML = '';
+  q.opts.forEach((opt, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = opt;
+    btn.addEventListener('click', ()=> handleAnswer(i, q));
+    optionsEl.appendChild(btn);
+  });
+}
+
+function handleAnswer(choice, q){
+  if(locked) return;
+  locked = true;
+  const buttons = optionsEl.querySelectorAll('.opt');
+  buttons.forEach((b,i)=>{
+    b.disabled = true;
+    if(i === q.a) b.classList.add('correct');
+    else if(i === choice) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+  if(choice === q.a){
+    score++;
+    catStats[q.cat].correct++;
+  }
+  explainEl.textContent = q.ex;
+  explainEl.classList.add('show');
+  nextBtn.disabled = false;
+}
+
+nextBtn.addEventListener('click', ()=>{
+  idx++;
+  if(idx >= order.length){
+    showResult();
+  } else {
+    render();
+  }
+});
+
+function rankFor(pct){
+  if(pct >= 92) return ["マスター","テレビ・ラジオ・スポーツすべてに精通した生き字引レベルです。"];
+  if(pct >= 76) return ["かなりの通","日常的にメディアに親しんでいることが伝わる好成績です。"];
+  if(pct >= 56) return ["一般常識あり","平均的な視聴者として十分な知識をお持ちです。"];
+  if(pct >= 36) return ["もう少し","間違えた分野を中心にチェックしてみましょう。"];
+  return ["これから","番組をきっかけに少しずつ知識を増やしていきましょう。"];
+}
+
+function showResult(){
+  quizArea.classList.add('hide');
+  progressFill.style.width = '100%';
+  resultEl.classList.add('show');
+
+  document.getElementById('scoreText').innerHTML = `${score}<span>/${order.length}</span>`;
+  const pct = Math.round((score/order.length)*100);
+  const [rank, comment] = rankFor(pct);
+  document.getElementById('rankText').textContent = `判定：${rank}（正答率 ${pct}%）`;
+  document.getElementById('commentText').textContent = comment;
+
+  const bd = document.getElementById('breakdown');
+  bd.innerHTML = '';
+  const labels = {tv:'📺 テレビ', radio:'📻 ラジオ', sports:'⚽ スポーツ'};
+  ['tv','radio','sports'].forEach(cat=>{
+    const s = catStats[cat];
+    const div = document.createElement('div');
+    div.className = 'bd-item';
+    div.innerHTML = `<div class="n">${s.correct}/${s.total}</div><div class="l">${labels[cat]}</div>`;
+    bd.appendChild(div);
+  });
+}
+
+retryBtn.addEventListener('click', ()=>{
+  order = shuffle(QUESTIONS.map((_,i)=>i));
+  idx = 0;
+  score = 0;
+  catStats.tv = {correct:0,total:0};
+  catStats.radio = {correct:0,total:0};
+  catStats.sports = {correct:0,total:0};
+  resultEl.classList.remove('show');
+  quizArea.classList.remove('hide');
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
